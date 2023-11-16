@@ -1,1 +1,1 @@
-# Lab3-rvore-Bin-ria-de-Busca
+# Lab3-Arvore-binaria-de-Busca
