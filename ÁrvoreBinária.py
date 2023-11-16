@@ -1,3 +1,5 @@
+import json
+
 class BinaryTree:
     def __init__(self, value):
         self.key = value
@@ -57,18 +59,78 @@ class BinaryTree:
         elif value<self.key and self.left!=None:
             print('->', end=' ')
             self.left.getValuePath(value)
-        
+
+    def getHeigth(self):    
+        if self.left!=None:
+            return 1 + self.left.getHeigth()
+        if self.right!=None:
+            return 1 + self.right.getHeigth()
+        return 1
     
+    def getMaxValueObj(self):
+        if self.right!=None:
+            return self.right.getMaxValueObj()
+        return self
+    
+    def getMinValueObj(self):
+        if self.left!=None:
+            return self.left.getMinValueObj()
+        return self
+    
+
+    def updateParentReference(self, parent, target=None):
+        if parent.left == self:
+            parent.left = target
+        else:
+            parent.right = target
+
+    def removeValue(self, value, parent=None):
+
+        if self.key==value:
+            if self.left is None and self.right is None:
+                self.updateParentReference(parent)
+            elif self.left is None:
+                self.updateParentReference(parent, self.right)
+            elif self.right is None:
+                self.updateParentReference(parent, self.left)
+            else:
+                if self.left.getHeigth() > self.right.getHeigth():
+                    max_value = self.left.getMaxValueObj()
+                    self.updateParentReference(parent, max_value)
+                    max_value.right = self.right
+                else:
+                    min_value = self.right.getMinValueObj()
+                    self.updateParentReference(parent, min_value)
+                    min_value.left = self.left
+        elif value>self.key and self.right!=None:
+            self.right.removeValue(value, self)
+        elif value<self.key and self.left!=None:
+            self.left.removeValue(value, self)
+        else:
+            print("Não achei o valor para remover")
+
+    def to_dict(self):
+        d = {'key': self.key}
+
+        if self.left is not None:
+            d['left'] = self.left.to_dict()
+        if self.right is not None:
+            d['right'] = self.right.to_dict()
+
+        return d
+
+
 #criando um nó
 raiz = BinaryTree(20)
 raiz.insertNode(10)
 raiz.insertNode(8)
 raiz.insertNode(15)
+raiz.insertNode(9)
 raiz.insertNode(40)
 raiz.insertNode(30)
 raiz.insertNode(50)
 
-#
+
 print("Pre-Ordem")
 raiz.preOrder()
 print("Em Ordem")
@@ -76,5 +138,16 @@ raiz.inOrder()
 print("Pos-Ordem")
 raiz.posOrder()
 
+
+json_string = json.dumps(raiz.to_dict(), indent=4)
+print("######Árvore Original#####")
+print(json_string)
+
+
 raiz.getValuePath(50)
-raiz.removeValue(50)
+raiz.removeValue(40)
+
+json_string = json.dumps(raiz.to_dict(), indent=4)
+print("######Árvore Modificada######")
+print(json_string)
+
